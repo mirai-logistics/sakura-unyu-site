@@ -308,6 +308,37 @@ body.menu-open .header{z-index:220}
 .hnews:hover .hnews__arw{transform:translateX(4px)}
 .hnews__arw svg{width:18px;height:18px}
 @media(max-width:640px){.hnews{flex-wrap:wrap;gap:10px 14px}.hnews__ttl{flex:1 1 100%;order:3}}
+
+/* ===== CERT_CSS:START 認証マーク =====
+   このブロックは index.html の <style> と assets/site.css の両方に、
+   1文字も違わない同じ内容で置くこと（index.html は site.css を読まないため）。
+   確認: diff <(sed -n '/CERT_CSS:START/,/CERT_CSS:END/p' index.html) \
+              <(sed -n '/CERT_CSS:START/,/CERT_CSS:END/p' assets/site.css)
+   ※ .certs{padding-top:0} は .section{padding:...} と同じ詳細度なので、
+     このブロックは必ず両ファイルの末尾に置く（後に書いた方が勝つ）。 */
+.certs{background:#fff;padding-top:0}
+.certs .label{margin-bottom:40px}
+.certs .label .en{font-size:clamp(22px,2.4vw,30px)}
+.certs__list{list-style:none;padding:0;margin:0 auto;max-width:760px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(14px,2.2vw,26px)}
+.cert{text-align:center}
+.cert__box{display:grid;place-items:center;aspect-ratio:1/1;background:#fff;border:1px solid #e6e4db;border-radius:12px;padding:clamp(8px,1.4vw,14px)}
+.cert__box img{width:100%;height:100%;object-fit:contain}
+.cert__cap{display:block;margin-top:12px;font-size:12px;line-height:1.7;letter-spacing:.02em;color:var(--gray)}
+/* 会社概要テーブルの行に収める縮小版 */
+.certs__list--inrow{max-width:520px;margin:4px 0 2px;gap:14px}
+.certs__list--inrow .cert__box{border-radius:10px;padding:8px}
+.certs__list--inrow .cert__cap{margin-top:8px;font-size:11px;line-height:1.6}
+/* 上書きは基本ルールより後ろに置く（メディアクエリは詳細度を上げない）。
+   4列→2列の一段だけにする（4件を3+1で折り返すと必ず不格好になるため）。 */
+@media(max-width:1000px){
+  /* 会社概要は dt が 220px 幅を取るぶん列が狭いので、トップより早く 2 列へ落とす */
+  .certs__list--inrow{grid-template-columns:repeat(2,minmax(0,1fr));max-width:340px;gap:16px}
+}
+@media(max-width:800px){
+  .certs__list{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;max-width:400px}
+  .cert__cap{font-size:11.5px}
+}
+/* ===== CERT_CSS:END ===== */
 </style>
 </head>
 <body>
@@ -517,6 +548,34 @@ body.menu-open .header{z-index:220}
     </a>
   </div>
 </section>
+
+<!-- ===== CERT_HTML:START 認証マーク =====
+     Gマークの有効期限は2029年末。健康経営優良法人は年度更新（2027年版が出たら画像を差し替える）。
+     画像は assets/img/cert/ に 400x400 の白背景・光学サイズ揃えで置いてある。 -->
+<section class="section certs" id="certification">
+  <div class="wrap">
+    <div class="label rev"><span class="en">Certification</span><span class="ja">認証・認定</span></div>
+    <ul class="certs__list rev d1">
+      <li class="cert">
+        <span class="cert__box"><img src="assets/img/cert/cert_gmark.png" width="400" height="400" loading="lazy" decoding="async" alt="安全性優良事業所（Gマーク）認定事業所"></span>
+        <span class="cert__cap">安全性優良事業所<br>（Gマーク）</span>
+      </li>
+      <li class="cert">
+        <span class="cert__box"><img src="assets/img/cert/cert_hatarakiyasui.png" width="400" height="400" loading="lazy" decoding="async" alt="働きやすい職場認証制度 二つ星 認証事業者"></span>
+        <span class="cert__cap">働きやすい職場認証<br>（二つ星）</span>
+      </li>
+      <li class="cert">
+        <span class="cert__box"><img src="assets/img/cert/cert_kenko2026.png" width="400" height="400" loading="lazy" decoding="async" alt="健康経営優良法人2026 中小規模法人部門 認定法人"></span>
+        <span class="cert__cap">健康経営優良法人2026<br>（中小規模法人部門）</span>
+      </li>
+      <li class="cert">
+        <span class="cert__box"><img src="assets/img/cert/cert_green.png" width="400" height="400" loading="lazy" decoding="async" alt="グリーン経営認証 登録事業所"></span>
+        <span class="cert__cap">グリーン経営認証</span>
+      </li>
+    </ul>
+  </div>
+</section>
+<!-- ===== CERT_HTML:END ===== -->
 
 <footer class="footer">
   <div class="wrap">

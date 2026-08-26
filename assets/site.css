@@ -157,3 +157,34 @@ body.menu-open .header{z-index:220}
 .curtain .mark img{width:54px;height:auto}
 .footer .name{display:flex;align-items:center;gap:10px}
 .footer .name img{width:26px;height:auto}
+
+/* ===== CERT_CSS:START 認証マーク =====
+   このブロックは index.html の <style> と assets/site.css の両方に、
+   1文字も違わない同じ内容で置くこと（index.html は site.css を読まないため）。
+   確認: diff <(sed -n '/CERT_CSS:START/,/CERT_CSS:END/p' index.html) \
+              <(sed -n '/CERT_CSS:START/,/CERT_CSS:END/p' assets/site.css)
+   ※ .certs{padding-top:0} は .section{padding:...} と同じ詳細度なので、
+     このブロックは必ず両ファイルの末尾に置く（後に書いた方が勝つ）。 */
+.certs{background:#fff;padding-top:0}
+.certs .label{margin-bottom:40px}
+.certs .label .en{font-size:clamp(22px,2.4vw,30px)}
+.certs__list{list-style:none;padding:0;margin:0 auto;max-width:760px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(14px,2.2vw,26px)}
+.cert{text-align:center}
+.cert__box{display:grid;place-items:center;aspect-ratio:1/1;background:#fff;border:1px solid #e6e4db;border-radius:12px;padding:clamp(8px,1.4vw,14px)}
+.cert__box img{width:100%;height:100%;object-fit:contain}
+.cert__cap{display:block;margin-top:12px;font-size:12px;line-height:1.7;letter-spacing:.02em;color:var(--gray)}
+/* 会社概要テーブルの行に収める縮小版 */
+.certs__list--inrow{max-width:520px;margin:4px 0 2px;gap:14px}
+.certs__list--inrow .cert__box{border-radius:10px;padding:8px}
+.certs__list--inrow .cert__cap{margin-top:8px;font-size:11px;line-height:1.6}
+/* 上書きは基本ルールより後ろに置く（メディアクエリは詳細度を上げない）。
+   4列→2列の一段だけにする（4件を3+1で折り返すと必ず不格好になるため）。 */
+@media(max-width:1000px){
+  /* 会社概要は dt が 220px 幅を取るぶん列が狭いので、トップより早く 2 列へ落とす */
+  .certs__list--inrow{grid-template-columns:repeat(2,minmax(0,1fr));max-width:340px;gap:16px}
+}
+@media(max-width:800px){
+  .certs__list{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;max-width:400px}
+  .cert__cap{font-size:11.5px}
+}
+/* ===== CERT_CSS:END ===== */
