@@ -1,0 +1,72 @@
+name: やりたいこと
+description: 「こうなったらいいのに」を書く。技術的な書き方は要りません
+labels: ["request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **技術用語は要りません。困っていることを、そのまま書いてください。**
+        書きにくいときは、Claudeに「こういうことがしたいんだけど、Issueの下書きを作って」と頼んでも構いません。
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: いま、誰の、どの作業が困っていますか
+      description: 「誰が」「いつ」「何をするときに」「何に困るか」を書いてください
+      placeholder: |
+        例：事務が毎月5日ごろ、ドライバーの日報をExcelに手で写している。
+        1人30分×15人で、まる1日かかっている。写し間違いも月に数件ある。
+    validations:
+      required: true
+
+  - type: dropdown
+    id: repo
+    attributes:
+      label: どのあたりの話ですか
+      description: 分からなければ「分からない」で構いません。こちらで振り分けます
+      options:
+        - 分からない
+        - 社内アプリ(smart-mirai)
+        - 経営ダッシュボード(mirai-cockpit)
+        - 給与(mirai-payroll)
+        - 採用(ats-mirai / recruit-media)
+        - カリトラ(karitora-lp)
+        - 桜運輸さまのサイト(sakura-unyu-site)
+        - 単年度計画(annual-plan-app)
+        - AI秘書(ai-secretary)
+        - その他
+    validations:
+      required: true
+
+  - type: textarea
+    id: done
+    attributes:
+      label: どうなったら「解決した」と言えますか
+      description: できあがりの形が分からなくても、「これが無くなったら嬉しい」で構いません
+      placeholder: |
+        例：日報を写す作業が無くなって、5日の午前中に集計が見られる状態。
+    validations:
+      required: true
+
+  - type: input
+    id: due
+    attributes:
+      label: いつまでに要りますか
+      description: 決まっていなければ空でよいです
+      placeholder: 例：来月の給与計算まで
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: いま、どうやってしのいでいますか
+      description: すでに試したこと・使っている代わりの手段があれば書いてください
+      placeholder: |
+        例：Googleスプレッドシートに手で貼り付けて、関数で集計している。
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: 確認
+      options:
+        - label: この文章と添付に、給与・個人情報・鍵やパスワード・取引先名を書いていない(書いてしまった場合は一般化してください)
+          required: true
