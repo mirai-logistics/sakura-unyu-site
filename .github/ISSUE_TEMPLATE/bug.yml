@@ -1,0 +1,73 @@
+name: おかしい・動かない
+description: 動かない、表示がおかしい、エラーが出る
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **「何をしたら」「何が起きて」「本当はどうなってほしかったか」の3つが揃うと、すぐ直せます。**
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 何をしましたか
+      description: 押した順に書いてください。途中から分からなくなっても構いません
+      placeholder: |
+        例：
+        1. 配車の画面を開いた
+        2. 9月10日を選んだ
+        3. 「保存」を押した
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 何が起きましたか
+      description: 画面に出た文字があれば、そのまま書き写してください
+      placeholder: |
+        例：赤い帯が出て「保存できませんでした」と表示された。画面はそのまま。
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 本当はどうなってほしかったですか
+      placeholder: |
+        例：保存されて、一覧に9月10日の予定が出てくる。
+    validations:
+      required: true
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: 毎回起きますか
+      options:
+        - 毎回起きる
+        - ときどき起きる
+        - 1回だけ起きた
+        - 分からない
+    validations:
+      required: true
+
+  - type: input
+    id: env
+    attributes:
+      label: 何で見ていましたか
+      description: パソコンかスマホか、ブラウザは何か。分かる範囲で
+      placeholder: 例：会社のWindowsパソコン、Chrome
+
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: 画面の写真(任意)
+      description: この枠にそのまま画像を貼れます
+
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: 確認
+      options:
+        - label: 貼った画像と文章に、給与・個人情報・鍵やパスワード・取引先名が写っていない
+          required: true

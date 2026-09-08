@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# push 前の門番。main への直接 push を拒否する。
+#
+# なぜフックなのか:
+#   mirai-logistics は GitHub 無料プランで、private リポにブランチ保護を掛けられない
+#   (403 Upgrade to GitHub Pro)。PR 必須もセルフマージ禁止も GitHub 側では止められない。
+#   git 自身が実行するこのフックだけが、Claude Code の設定をどう変えても生き残る歯止め。
+#
+# 登録: bash scripts/setup.sh (git config core.hooksPath .githooks)
+#   ⚠ clone 直後は無効。setup.sh を 1 回打つまで、このフックは存在しないのと同じ。
+#
+# 例外の足し方:
+#   ALLOW_MAIN_PUSH=1 にできるのは「main への push がそのまま本番公開で、
+#   プレビュー環境が無い」リポだけ (sakura-unyu-site)。それ以外に足さない。
+#   足すときは PR で理由を書き、上野さんのレビューを通す。
+set -uo pipefail
+
+# このリポで main への直接 push を許すか。既定は 0 (拒否)。
+ALLOW_MAIN_PUSH=1
+
+protected_ref='refs/heads/main'
+fail=0
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$remote_ref" = "$protected_ref" ] || continue
+
+  # ブランチの削除 (local_sha がゼロ) も止める。
+  if [ "$local_sha" = "0000000000000000000000000000000000000000" ]; then
+    echo "✗ main を削除しようとしています。これは止めます。"
+    fail=1
+    continue
+  fi
+
+  # 履歴の巻き戻し (force push) を検出する。
+  # remote_sha が手元に無い = 相手の先端が自分の履歴に含まれない = 上書きになる。
+  if [ "$remote_sha" != "0000000000000000000000000000000000000000" ]; then
+    if ! git merge-base --is-ancestor "$remote_sha" "$local_sha" 2>/dev/null; then
+      echo "✗ main の履歴を巻き戻そうとしています (force push)。他の人の作業が消えます。"
+      fail=1
+      continue
+    fi
+  fi
+
+  if [ "$ALLOW_MAIN_PUSH" -eq 1 ]; then
+    echo "⚠ main へ直接 push します (このリポは main 直が正規運用)。"
+    continue
+  fi
+
+  fail=1
+done
+
+if [ "$fail" -ne 0 ]; then
+  cat <<'MSG'
+
+✗ main へ直接 push しようとしています。
+
+  変更はブランチを切って PR を出してください。Claude にこう頼めます:
+
+    mainで作業してしまいました。ブランチを切り直してPRを出してください。
+
+  詳しくは dev-rules の rules/git-flow.md §2 と rules/recovery.md §2。
+
+MSG
+fi
+
+exit "$fail"

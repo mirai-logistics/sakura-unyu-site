@@ -1,0 +1,5 @@
+# 改行コードを LF に固定する。
+# ⚠ これが無いと Windows で git hooks が CRLF になり、
+#    "bad interpreter" で落ちる = フックが黙って効かない状態になる。
+*.sh          text eol=lf
+.githooks/*   text eol=lf

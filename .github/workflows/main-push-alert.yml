@@ -1,0 +1,98 @@
+# main への直接 push を検知して Slack へ知らせる。
+#
+# なぜこれが要るのか:
+#   mirai-logistics は GitHub 無料プランで、private リポにブランチ保護を掛けられない。
+#   main 直 push を止めているのは pre-push フック(手元)だけで、
+#   フックを登録していない人と `--no-verify` は素通りする。
+#   「事故が起きてから対策を考える」方針を成り立たせるには、
+#   まず**起きたことに気づける**必要がある。これはその見張り。
+#
+# ⚠ これは止めない。起きた後に知らせるだけ。止めるのは pre-push フック。
+#
+# ⚠ 第三者の action を使っていない(curl だけ)。
+#    `@v4` のような動く印は持ち主がいつでも中身を差し替えられ、
+#    こちらの手を経ずに秘密情報を読む処理が走りうるため。
+#
+# 要る設定: SLACK_BOT_TOKEN(bot 名義で chat.postMessage できるもの)。
+#   ⚠ organization の secret は使えない。無料プランでは private リポへ配られないため
+#     (2026-09-08 実測)。作成 API は visibility=private を受け付けて 200 を返し、
+#     一覧にも載るのに、実行時は空で渡る。「作れた = 使える」ではない。
+#   → リポジトリごとに入れる: gh secret set SLACK_BOT_TOKEN -R mirai-logistics/<リポ名>
+#   無い間は、この job は静かに何もしない(CI を赤くしない)。
+#
+# 手で起動すると、Slack へ投稿せずに「秘密が読めているか」だけ報告する(dry-run)。
+#   gh workflow run "main への直接 push を知らせる" -R mirai-logistics/<リポ名>
+
+name: main への直接 push を知らせる
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: PR を経由したかを見て、直 push なら Slack へ知らせる
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          # #07開発_ai推進
+          SLACK_CHANNEL: C0BD6DL88FN
+          EVENT_NAME: ${{ github.event_name }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          ACTOR: ${{ github.actor }}
+          COMPARE: ${{ github.event.compare }}
+        run: |
+          set -uo pipefail
+
+          if [ -z "${SLACK_BOT_TOKEN}" ]; then
+            echo "✗ SLACK_BOT_TOKEN が読めません。何もしません。"
+            echo "  organization の secret(visibility=private)がこのリポへ届いているか確認してください。"
+            exit 0
+          fi
+          echo "◯ SLACK_BOT_TOKEN を読めました(長さ ${#SLACK_BOT_TOKEN})。"
+
+          # 手で起動したときは、Slack へ投稿せず、ここで終わる。
+          if [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
+            echo "手動起動なので、Slack へは投稿しません(秘密が読めるかの確認だけ)。"
+            exit 0
+          fi
+
+          # 🔴 CI が自分で main へ push するリポがある(sakura-unyu-site は microCMS の
+          #    webhook でお知らせを作り直して main へ commit する)。これを直 push として
+          #    知らせると、毎回鳴って誰も読まなくなる。bot の push は数えない。
+          case "${ACTOR}" in
+            *"[bot]"|github-actions) echo "bot(${ACTOR})の push なので知らせません。"; exit 0 ;;
+          esac
+
+          # この commit を含む PR があるか。無ければ直 push。
+          # ⚠ GitHub の式を run に直接埋めない(シェルインジェクションになる)。env 経由で渡す。
+          # ⚠ その式の記法は、この run の中のコメントにも書けない。GitHub は run の中まで
+          #    式として解析するので、空の式を書くとワークフロー全体が解析できずに落ちる。
+          pr_count="$(gh api "repos/${REPO}/commits/${SHA}/pulls" --jq 'length' 2>/dev/null || echo 0)"
+          if [ "${pr_count}" != "0" ]; then
+            echo "PR 経由のマージでした(PR ${pr_count} 件)。知らせません。"
+            exit 0
+          fi
+
+          subject="$(gh api "repos/${REPO}/commits/${SHA}" --jq '.commit.message' 2>/dev/null | head -1)"
+
+          text="$(printf '⚠ *%s* の main へ直接 push がありました\n実行者: %s\n内容: %s\n%s\n\n_PR を経由していません。意図した操作か確認してください(dev-rules rules/git-flow.md §2)。_' \
+            "${REPO}" "${ACTOR}" "${subject}" "${COMPARE}")"
+
+          jq -n --arg ch "${SLACK_CHANNEL}" --arg t "${text}" \
+            '{channel: $ch, text: $t}' \
+          | curl -sS -X POST https://slack.com/api/chat.postMessage \
+              -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+              -H 'Content-Type: application/json; charset=utf-8' \
+              --data @- \
+          | jq -e '.ok' >/dev/null || { echo "Slack への投稿に失敗しました"; exit 1; }
+
+          echo "Slack へ知らせました。"

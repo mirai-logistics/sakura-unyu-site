@@ -164,3 +164,21 @@ Search Console の所有権確認用TXTも同様（削除すると確認が外�
 ```
 
 `CNAME` と `.nojekyll` は削除するとサイトが正しく公開されなくなる。
+
+## 開発ルール(organization共通)
+
+organizationの全リポに効く開発ルールは`mirai-logistics/dev-rules`。clone先は各自の`~/.claude/CLAUDE.md`に書いてある。
+**Issueを立てる・ブランチを切る・PRを出す・危ないコマンドを打つ・壊した**ときは、
+必ず`dev-rules/README.md`の索引を読み、そこから該当ルールをReadする。
+
+常時効くもの(正本はdev-rules):
+
+- 🔴 `main`へ直接pushしない。ブランチを切ってPRを出す
+- 🔴 自分のPRを自分でマージしない。レビュアーを指名する(例外は上野さんだけ)
+- 🔴 `--dangerously-skip-permissions`と`defaultMode: bypassPermissions`を使わない
+- 🔴 秘密情報をcommitしない(`.env`・鍵・給与・個人情報・取引先名)
+- ⚠ `git add -A`と`git add .`を使わない。パスを明示する
+- ⚠ `origin`はorg(`mirai-logistics/…`)に固定する。forkしない
+
+⚠ **cloneしただけでは歯止めが効かない**。このリポで1回`bash scripts/setup.sh`を打つまで、
+`main`への直接pushも秘密の混入も止まらない。

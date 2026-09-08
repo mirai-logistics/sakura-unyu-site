@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# コミット前の安い検査。数十秒以内を守る。
+#   1) gitleaks … 秘密の混入 (鍵・トークン・パスワード)
+#
+# ⚠ ここは全リポ共通の最小セット。リポ固有の検査 (型・lint・テスト) は
+#    この下に足す。足したものは消さない。
+#
+# 登録: bash scripts/setup.sh (git config core.hooksPath .githooks)
+#   ⚠ clone 直後は無効。setup.sh を 1 回打つまで効かない。
+#
+# ⚠ skip 設定を足さない。落ちるのを避けるのではなく、指摘されたものを直す。
+#    gitleaks の allowlist (.gitleaks.toml) も置かない (既定ルールのまま使う)。
+set -uo pipefail
+cd "$(git rev-parse --show-toplevel)"
+fail=0
+step() { printf '\n■ %s\n' "$1"; }
+
+step "gitleaks(秘密の混入)"
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks git --staged --redact --no-banner . || fail=1
+else
+  echo "✗ gitleaks が入っていません。秘密の混入を検査できないので commit を止めます。"
+  echo "  入れ方: dev-rules の setup/mac.md か setup/windows.md"
+  fail=1
+fi
+
+# --- ここから下にリポ固有の検査を足す ---
+# 例: uv run --quiet pytest -q tests/unit || fail=1
+
+if [ "$fail" -ne 0 ]; then
+  cat <<'MSG'
+
+✗ pre-commit で落ちました。
+
+  秘密情報 (鍵・トークン・パスワード) が混ざっている可能性があります。
+  上の指摘を読んで、該当のファイルを commit から外してください。
+
+  ⚠ すでに push してしまっている場合は、消すより先にその鍵を無効化します。
+     dev-rules の rules/secrets.md §4。
+
+MSG
+fi
+
+exit "$fail"
