@@ -42,8 +42,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          # #07開発_ai推進
-          SLACK_CHANNEL: C0BD6DL88FN
+          # #07開発_github通知。⚠ 人の会話するチャンネルへ出さない
+          #   (見張りの通知が会話に混ざると、どちらも読まれなくなる)。
+          # チャンネルを変えるときは、17リポへPRを出し直さずに済むよう
+          # リポの変数で上書きする: gh variable set SLACK_CHANNEL -R <org>/<リポ名>
+          SLACK_CHANNEL: ${{ vars.SLACK_CHANNEL || 'C0C0547GCKX' }}
           EVENT_NAME: ${{ github.event_name }}
           REPO: ${{ github.repository }}
           SHA: ${{ github.sha }}
