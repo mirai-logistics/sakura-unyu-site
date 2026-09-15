@@ -60,6 +60,26 @@
 .goalbar li{font-size:12.5px;font-weight:500;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:8px 14px;line-height:1.7}
 @media(max-width:820px){.goalbar ul{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.goalbar ul{grid-template-columns:1fr}}
+/* ===== HEALTH_CSS:START 健康宣言（宣言書をそのまま貼ったような1枚） ===== */
+.hd{display:grid;grid-template-columns:1fr 340px;gap:40px;align-items:start}
+.hd:not(:has(.hd-fig)){grid-template-columns:1fr}
+.hd:not(:has(.hd-fig)) .hd-main{max-width:860px;margin:0 auto}
+.hd-main{background:#fff;border:2px solid var(--green);border-radius:18px;padding:40px 44px 32px;box-shadow:0 16px 40px rgba(34,40,37,.08)}
+.hd-body p{font-size:15px;color:#3c443f;line-height:2.05;text-align:justify}
+.hd-body p + p{margin-top:16px}
+.hd-list{margin-top:26px;border-top:1px dashed rgba(45,106,79,.3);padding-top:22px;display:grid;gap:10px}
+.hd-list li{position:relative;padding-left:26px;font-size:13.5px;color:#4a524d;line-height:1.85}
+.hd-list li::before{content:"";position:absolute;left:8px;top:.72em;width:7px;height:7px;border-radius:50%;background:var(--green)}
+.hd-sign{margin-top:30px;text-align:right;line-height:1.9}
+.hd-sign .hd-date{font-size:13px;color:var(--gray);letter-spacing:.06em}
+.hd-sign .hd-name{font-size:14px;color:var(--green-deep);font-weight:700;margin-top:4px}
+.hd-sign .hd-name b{display:inline-block;margin-left:14px;font-size:16px;letter-spacing:.08em}
+.hd-fig{position:sticky;top:110px}
+.hd-fig img{width:100%;height:auto;border-radius:10px;border:1px solid rgba(34,40,37,.12);box-shadow:0 14px 34px rgba(34,40,37,.12);background:#fff}
+.hd-fig figcaption{margin-top:10px;text-align:center;font-size:12px;color:var(--gray);letter-spacing:.08em}
+@media(max-width:980px){.hd{grid-template-columns:1fr}.hd-fig{position:static;max-width:420px;margin:0 auto}}
+@media(max-width:820px){.hd-main{padding:28px 22px 24px}.hd-body p{font-size:14.5px;line-height:1.95;text-align:left}.hd-sign .hd-name b{display:block;margin-left:0;margin-top:2px}}
+/* ===== HEALTH_CSS:END ===== */
 /* ===== 取り組み事例：写真とテキストの交互レイアウト ===== */
 .act{display:grid;grid-template-columns:1fr 1fr;gap:46px;align-items:center;margin-bottom:66px}
 .act:last-child{margin-bottom:0}
@@ -143,6 +163,52 @@
     </div>
   </div>
 </section>
+
+<!-- ===== HEALTH_HTML:START 健康宣言 =====
+     ⚠ 中身はすべて仮置き。先方(桜運輸さま)から受け取った宣言書に差し替えるまで main へ入れないこと。
+     差し替えるのは次の4か所だけで、構造とCSSは触らなくてよい：
+       (1) .hd-body    … 宣言の本文（段落は <p> を並べる）
+       (2) .hd-list    … 取り組み項目（不要なら <ul> ごと削除）
+       (3) .hd-sign    … 宣言年月日・会社名・宣言者
+       (4) .hd-fig     … 宣言書の画像（載せないなら <figure> ごと削除。1カラムに戻る）
+     起票: MIRAI-0355
+     ===== -->
+<section class="section" id="health">
+  <div class="wrap">
+    <div class="label rev"><span class="en">Health</span><span class="ja">健康宣言</span></div>
+
+    <div class="hd rev d1">
+      <div class="hd-main">
+        <div class="hd-body">
+          <!-- TODO(MIRAI-0355): ここを先方の宣言文に差し替える -->
+          <p>（仮）当社は、従業員とその家族の健康が事業の基盤であるとの考えのもと、健康経営に取り組むことをここに宣言します。</p>
+          <p>（仮）安全な輸送を担う一人ひとりが心身ともに健康であり続けられるよう、働きやすい職場環境づくりを会社全体で推進します。</p>
+        </div>
+
+        <!-- TODO(MIRAI-0355): 取り組み項目。先方の宣言書に項目が無ければ <ul> ごと削除する -->
+        <ul class="hd-list">
+          <li>（仮）定期健康診断の受診率100%と、二次検査の確実な受診</li>
+          <li>（仮）長時間労働の抑制と、十分な休養が取れる勤務体制の整備</li>
+          <li>（仮）生活習慣の改善に向けた情報提供と、受動喫煙の防止</li>
+          <li>（仮）心の健康づくりに関する相談窓口の周知</li>
+        </ul>
+
+        <div class="hd-sign">
+          <!-- TODO(MIRAI-0355): 宣言年月日・宣言者を差し替える -->
+          <p class="hd-date">（仮）2026年○月○日</p>
+          <p class="hd-name">桜運輸株式会社<b>代表取締役　細江 良枝</b></p>
+        </div>
+      </div>
+
+      <!-- TODO(MIRAI-0355): 宣言書の画像。載せないなら <figure> ごと削除する（本文が1カラムに戻る） -->
+      <figure class="hd-fig">
+        <img src="assets/img/health_sengen.jpg" width="900" height="1273" loading="lazy" decoding="async" alt="桜運輸株式会社の健康宣言書">
+        <figcaption>（仮）健康宣言書</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+<!-- ===== HEALTH_HTML:END ===== -->
 
 <section class="section" style="background:#f1f0e9">
   <div class="wrap">
